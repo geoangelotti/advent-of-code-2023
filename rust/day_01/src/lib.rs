@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub fn process_part_1(input: &str) -> String {
     input
         .lines()
@@ -18,7 +20,23 @@ pub fn process_part_1(input: &str) -> String {
 }
 
 pub fn process_part_2(input: &str) -> String {
-    process_part_1(input)
+    let converter = HashMap::from([
+        ("zero", "z0ero"),
+        ("one", "o1ne"),
+        ("two", "t2wo"),
+        ("three", "t3hree"),
+        ("four", "f4our"),
+        ("five", "f5ive"),
+        ("six", "s6ix"),
+        ("seven", "s7even"),
+        ("eight", "e8ight"),
+        ("nine", "n9ine"),
+    ]);
+    let mut new_input = input.to_string();
+    for (k, v) in converter {
+        new_input = new_input.replace(k, v);
+    }
+    process_part_1(new_input.as_str())
 }
 
 #[cfg(test)]
