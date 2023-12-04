@@ -6,40 +6,38 @@ import (
 	"strings"
 )
 
-type Game struct {
-	Red   int
-	Green int
-	Blue  int
-}
-
-func getGames(input string) []Game {
-	games := []Game{}
-
-	fmt.Println(games)
-	return games
-}
-
-func (g Game) IsPossible() bool {
-	return g.Red <= target.Red && g.Green <= target.Green && g.Blue <= target.Blue
-}
-
-var target Game = Game{
-	Red:   12,
-	Green: 13,
-	Blue:  14,
-}
-
 func ProcessPart1(input string) string {
-	var sum int64
+	var sum uint64
 	lines := strings.Split(input, "\n")
-	getGames("")
+	var red uint64 = 12
+	var green uint64 = 13
+	var blue uint64 = 14
 	for _, line := range lines {
 		gameLine := strings.Split(line, ":")
-		game := strings.Split(gameLine[0], " ")
-		gameNumber, _ := strconv.ParseInt(game[1], 10, 64)
-		games := strings.Split(gameLine[1], ";")
-		fmt.Println(gameNumber, games)
-
+		gameIdentifier := strings.Split(gameLine[0], " ")
+		game, _ := strconv.ParseUint(gameIdentifier[1], 10, 64)
+		plays := strings.Split(gameLine[1], ";")
+		possible := true
+		for _, play := range plays {
+			cubes := strings.Split(play, ",")
+			appearances := map[string]uint64{
+				"red":   0,
+				"green": 0,
+				"blue":  0,
+			}
+			for _, cube := range cubes {
+				atoms := strings.Split(cube, " ")
+				number, _ := strconv.ParseUint(atoms[1], 10, 64)
+				colour := atoms[2]
+				appearances[colour] = number
+			}
+			if appearances["red"] > red || appearances["green"] > green || appearances["blue"] > blue {
+				possible = false
+			}
+		}
+		if possible {
+			sum += game
+		}
 	}
 	return fmt.Sprint(sum)
 }
