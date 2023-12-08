@@ -11,8 +11,8 @@ func ProcessPart1(input string) string {
 	for _, line := range lines {
 		values := []int64{}
 		for _, char := range line {
-			if 57 >= char && 48 <= char {
-				values = append(values, int64(char)-48)
+			if '9' >= char && '0' <= char {
+				values = append(values, int64(char)-'0')
 			}
 		}
 		if len(values) > 0 {
