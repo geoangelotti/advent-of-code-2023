@@ -35,3 +35,19 @@ func TestProcessPart1_again(t *testing.T) {
 		t.Errorf("Expected %s got %s", expected, answer)
 	}
 }
+
+func TestProcessPart2(t *testing.T) {
+	expected := "467835"
+	answer := day03.ProcessPart2(INPUT)
+	if answer != expected {
+		t.Errorf("Expected %s got %s", expected, answer)
+	}
+}
+
+func TestProcessPart2_again(t *testing.T) {
+	expected := "1170"
+	answer := day03.ProcessPart2(INPUT2)
+	if answer != expected {
+		t.Errorf("Expected %s got %s", expected, answer)
+	}
+}
