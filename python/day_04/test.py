@@ -1,4 +1,4 @@
-from lib import process_part1
+from lib import process_part1, process_part2
 
 INPUT="""Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
@@ -9,3 +9,4 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
 
 
 assert process_part1(INPUT) == "13", "Should be 13"
+assert process_part2(INPUT) == "30", "Should be 30"
