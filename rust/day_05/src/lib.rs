@@ -19,13 +19,10 @@ impl SeedMap {
             .mappings
             .iter()
             .find(|(source_range, _)| source_range.contains(&source));
-        dbg!(valid_mapping);
         let Some((source_range, destination_range)) = valid_mapping else {
             return source;
         };
-        dbg!(source_range, destination_range);
         let offset = source - source_range.start;
-
         destination_range.start + offset
     }
 }
