@@ -12,13 +12,13 @@ use std::{collections::BTreeMap, iter::zip};
 
 #[derive(Debug, PartialEq, PartialOrd, Eq)]
 enum Type {
-    Five,
-    Four,
-    FullHouse,
-    Three,
-    TwoPair,
-    OnePair,
-    High,
+    FiveOfAKind = 6,
+    FourOfAKind = 5,
+    FullHouse = 4,
+    ThreeOfAKind = 3,
+    TwoPair = 2,
+    OnePair = 1,
+    HighCard = 0,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -77,23 +77,23 @@ fn get_type_strength(cards: &str) -> Option<Type> {
         .map(|(k, v)| (k, v.count() as u32))
         .collect();
     match frequency.len() {
-        1 => Some(Type::Five),
+        1 => Some(Type::FiveOfAKind),
         2 => {
             if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 4) {
-                return Some(Type::Four);
+                return Some(Type::FourOfAKind);
             } else {
                 return Some(Type::FullHouse);
             }
         }
         3 => {
             if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 3) {
-                return Some(Type::Three);
+                return Some(Type::ThreeOfAKind);
             } else {
                 return Some(Type::TwoPair);
             }
         }
         4 => Some(Type::OnePair),
-        5 => Some(Type::High),
+        5 => Some(Type::HighCard),
         _ => None,
     }
 }
