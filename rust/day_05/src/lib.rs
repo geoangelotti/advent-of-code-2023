@@ -2,10 +2,11 @@ use nom::{
     bytes::complete::take_until,
     character::complete::{self, line_ending, space1},
     multi::{many1, separated_list1},
-    sequence::tuple,
+    sequence::{separated_pair, tuple},
     IResult, Parser,
 };
 use nom_supreme::{tag::complete::tag, ParserExt};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::ops::Range;
 
 #[derive(Debug)]
@@ -54,6 +55,18 @@ fn parse_seedmaps(input: &str) -> IResult<&str, (Vec<u64>, Vec<SeedMap>)> {
     Ok((input, (seeds, maps)))
 }
 
+fn parse_seedranges(input: &str) -> IResult<&str, (Vec<Range<u64>>, Vec<SeedMap>)> {
+    let (input, seeds) = tag("seeds: ")
+        .precedes(separated_list1(
+            space1,
+            separated_pair(complete::u64, tag(" "), complete::u64)
+                .map(|(start, offset)| start..(start + offset)),
+        ))
+        .parse(input)?;
+    let (input, maps) = many1(seed_map)(input)?;
+    Ok((input, (seeds, maps)))
+}
+
 pub fn process_part_1(input: &str) -> String {
     let (_, (seeds, maps)) = parse_seedmaps(input).unwrap();
     let locations = seeds
@@ -63,6 +76,16 @@ pub fn process_part_1(input: &str) -> String {
     locations.iter().min().unwrap().to_string()
 }
 
+pub fn process_part_2(input: &str) -> String {
+    let (_, (seeds, maps)) = parse_seedranges(input).unwrap();
+    seeds
+        .into_par_iter()
+        .flat_map(|range| range.clone())
+        .map(|seed| maps.iter().fold(seed, |seed, map| map.translate(seed)))
+        .min()
+        .unwrap()
+        .to_string()
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,5 +129,11 @@ humidity-to-location map:
     fn part_1_works() {
         let result = process_part_1(INPUT);
         assert_eq!(result, 35.to_string());
+    }
+
+    #[test]
+    fn part_2_works() {
+        let result = process_part_2(INPUT);
+        assert_eq!(result, 46.to_string())
     }
 }
