@@ -8,7 +8,7 @@ use nom::{
 };
 use nom_supreme::ParserExt;
 use std::cmp::Ordering::{self, Equal, Greater, Less};
-use std::{collections::BTreeMap, iter::zip};
+use std::iter::zip;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq)]
 enum Type {
@@ -69,13 +69,7 @@ impl<'a> PartialOrd for Hand<'a> {
 }
 
 fn get_type_strength(cards: &str) -> Option<Type> {
-    let frequency: BTreeMap<char, u32> = cards
-        .chars()
-        .sorted()
-        .group_by(|&x| x)
-        .into_iter()
-        .map(|(k, v)| (k, v.count() as u32))
-        .collect();
+    let frequency = cards.chars().counts();
     match frequency.len() {
         1 => Some(Type::FiveOfAKind),
         2 => {
