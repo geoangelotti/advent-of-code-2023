@@ -69,11 +69,12 @@ fn parse_seedranges(input: &str) -> IResult<&str, (Vec<Range<u64>>, Vec<SeedMap>
 
 pub fn process_part_1(input: &str) -> String {
     let (_, (seeds, maps)) = parse_seedmaps(input).unwrap();
-    let locations = seeds
+    seeds
         .iter()
         .map(|seed| maps.iter().fold(*seed, |seed, map| map.translate(seed)))
-        .collect::<Vec<u64>>();
-    locations.iter().min().unwrap().to_string()
+        .min()
+        .unwrap()
+        .to_string()
 }
 
 pub fn process_part_2(input: &str) -> String {
