@@ -7,10 +7,9 @@ use nom::{
     IResult, Parser,
 };
 use nom_supreme::ParserExt;
-use std::cmp::Ordering::{self, Equal, Greater, Less};
-use std::iter::zip;
+use std::ops::Deref;
 
-#[derive(Debug, PartialEq, PartialOrd, Eq)]
+#[derive(Debug, Clone, Copy)]
 enum HandType {
     FiveOfAKind = 6,
     FourOfAKind = 5,
@@ -21,102 +20,54 @@ enum HandType {
     HighCard = 0,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct Hand<'a> {
-    type_strength: HandType,
-    cards: &'a str,
-    bid: u64,
-}
+fn get_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
+    use HandType::*;
+    let frequency = cards.chars().counts().values().sorted().join("");
 
-fn my_cmp(a: &Hand, b: &Hand) -> Ordering {
-    if a.type_strength > b.type_strength {
-        return Less;
-    }
-    if a.type_strength < b.type_strength {
-        return Greater;
-    }
-    let view = zip(a.cards.chars(), b.cards.chars());
-    for (a, b) in view {
-        if a != b {
-            return match (a, b) {
-                ('A', _) => Greater,
-                (_, 'A') => Less,
-                ('K', _) => Greater,
-                (_, 'K') => Less,
-                ('Q', _) => Greater,
-                (_, 'Q') => Less,
-                ('J', _) => Greater,
-                (_, 'J') => Less,
-                ('T', _) => Greater,
-                (_, 'T') => Less,
-                (a, b) => a.cmp(&b),
-            };
-        }
-    }
-    Equal
-}
-
-impl<'a> Ord for Hand<'a> {
-    fn cmp(&self, other: &Self) -> Ordering {
-        my_cmp(self, other)
-    }
-}
-
-impl<'a> PartialOrd for Hand<'a> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(my_cmp(self, other))
-    }
-}
-
-fn get_type_strength(cards: &str) -> Option<HandType> {
-    let frequency = cards.chars().counts();
-    match frequency.len() {
-        1 => Some(HandType::FiveOfAKind),
-        2 => {
-            if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 4) {
-                return Some(HandType::FourOfAKind);
-            } else {
-                return Some(HandType::FullHouse);
-            }
-        }
-        3 => {
-            if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 3) {
-                return Some(HandType::ThreeOfAKind);
-            } else {
-                return Some(HandType::TwoPair);
-            }
-        }
-        4 => Some(HandType::OnePair),
-        5 => Some(HandType::HighCard),
+    let hand_type = match frequency.deref() {
+        "5" => Some(FiveOfAKind),
+        "14" => Some(FourOfAKind),
+        "23" => Some(FullHouse),
+        "113" => Some(ThreeOfAKind),
+        "122" => Some(TwoPair),
+        "1112" => Some(OnePair),
+        "11111" => Some(HighCard),
         _ => None,
     }
+    .unwrap();
+    let card_scores = cards
+        .chars()
+        .map(|card| match card {
+            'A' => 14,
+            'K' => 13,
+            'Q' => 12,
+            'J' => 11,
+            'T' => 10,
+            value => value.to_digit(10).unwrap(),
+        })
+        .collect_tuple()
+        .unwrap();
+    (hand_type, card_scores)
 }
 
-fn parse_hand(input: &str) -> IResult<&str, Hand> {
+fn parse_hand(input: &str) -> IResult<&str, (&str, u64)> {
     let (input, (cards, bid)) = tuple((alphanumeric1, complete::u64.preceded_by(tag(" "))))(input)?;
-    Ok((
-        input,
-        Hand {
-            type_strength: get_type_strength(cards).unwrap(),
-            cards,
-            bid,
-        },
-    ))
+    Ok((input, (cards, bid)))
 }
 
-fn parse_hands(input: &str) -> IResult<&str, Vec<Hand>> {
+fn parse_hands(input: &str) -> IResult<&str, Vec<(&str, u64)>> {
     let (input, hands) = separated_list1(newline, parse_hand).parse(input)?;
     Ok((input, hands))
 }
 
 pub fn process_part_1(input: &str) -> String {
-    let (_, mut hands) = parse_hands(input).unwrap();
-    hands.sort();
+    let (_, hands) = parse_hands(input).unwrap();
     hands
         .iter()
+        .map(|hand| (hand, get_hand_strength(hand.0)))
+        .sorted_by_key(|x| (x.1 .0 as u8, x.1 .1))
         .enumerate()
-        .map(|(i, h)| (i + 1) as u64 * h.bid)
-        //.collect::<Vec<u64>>()
+        .map(|(i, ((_, bid), _))| (i as u64 + 1) * bid)
         .sum::<u64>()
         .to_string()
 }
