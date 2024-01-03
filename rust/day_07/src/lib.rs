@@ -141,7 +141,7 @@ KTJJT 220
 QQQJA 483";
 
     #[test]
-    fn it_works() {
+    fn part_1_works() {
         let result = process_part_1(INPUT);
         assert_eq!(result, "6440");
     }
