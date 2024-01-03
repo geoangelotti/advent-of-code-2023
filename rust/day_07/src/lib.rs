@@ -64,10 +64,10 @@ pub fn process_part_1(input: &str) -> String {
     let (_, hands) = parse_hands(input).unwrap();
     hands
         .iter()
-        .map(|hand| (hand, get_hand_strength(hand.0)))
-        .sorted_by_key(|x| (x.1 .0 as u8, x.1 .1))
+        .map(|(hand, bid)| (hand, bid, get_hand_strength(hand)))
+        .sorted_by_key(|(_, _, x)| (x.0 as u8, x.1))
         .enumerate()
-        .map(|(i, ((_, bid), _))| (i as u64 + 1) * bid)
+        .map(|(i, (_, bid, _))| (i as u64 + 1) * bid)
         .sum::<u64>()
         .to_string()
 }
