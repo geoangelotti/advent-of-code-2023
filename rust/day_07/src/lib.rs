@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use itertools::{Itertools, Position};
 use nom::{
     bytes::complete::tag,
     character::complete::{self, alphanumeric1, newline},
@@ -23,7 +23,6 @@ enum HandType {
 fn get_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
     use HandType::*;
     let frequency = cards.chars().counts().values().sorted().join("");
-
     let hand_type = match frequency.deref() {
         "5" => Some(FiveOfAKind),
         "14" => Some(FourOfAKind),
@@ -42,6 +41,53 @@ fn get_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
             'K' => 13,
             'Q' => 12,
             'J' => 11,
+            'T' => 10,
+            value => value.to_digit(10).unwrap(),
+        })
+        .collect_tuple()
+        .unwrap();
+    (hand_type, card_scores)
+}
+
+fn get_joker_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
+    use HandType::*;
+    let frequency = cards.chars().counts();
+    let values = if let Some(joker_count) = frequency.get(&'J') {
+        if *joker_count == 5 {
+            "5".to_string()
+        } else {
+            frequency
+                .iter()
+                .filter_map(|(key, value)| (key != &'J').then_some(value))
+                .sorted()
+                .with_position()
+                .map(|(position, value)| match position {
+                    Position::Last | Position::Only => value + joker_count,
+                    _ => *value,
+                })
+                .join("")
+        }
+    } else {
+        frequency.values().sorted().join("")
+    };
+
+    let hand_type = match values.deref() {
+        "5" => FiveOfAKind,
+        "14" => FourOfAKind,
+        "23" => FullHouse,
+        "113" => ThreeOfAKind,
+        "122" => TwoPair,
+        "1112" => OnePair,
+        "11111" => HighCard,
+        value => panic!("should never happen. Encountered `{}`", value),
+    };
+    let card_scores = cards
+        .chars()
+        .map(|card| match card {
+            'A' => 14,
+            'K' => 13,
+            'Q' => 12,
+            'J' => 1,
             'T' => 10,
             value => value.to_digit(10).unwrap(),
         })
@@ -72,6 +118,18 @@ pub fn process_part_1(input: &str) -> String {
         .to_string()
 }
 
+pub fn process_part_2(input: &str) -> String {
+    let (_, hands) = parse_hands(input).unwrap();
+    hands
+        .iter()
+        .map(|(hand, bid)| (hand, bid, get_joker_hand_strength(hand)))
+        .sorted_by_key(|(_, _, x)| (x.0 as u8, x.1))
+        .enumerate()
+        .map(|(i, (_, bid, _))| (i as u64 + 1) * bid)
+        .sum::<u64>()
+        .to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -86,5 +144,11 @@ QQQJA 483";
     fn it_works() {
         let result = process_part_1(INPUT);
         assert_eq!(result, "6440");
+    }
+
+    #[test]
+    fn part_2_works() {
+        let result = process_part_2(INPUT);
+        assert_eq!(result, "5905");
     }
 }
