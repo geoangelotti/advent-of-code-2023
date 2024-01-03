@@ -11,7 +11,7 @@ use std::cmp::Ordering::{self, Equal, Greater, Less};
 use std::iter::zip;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq)]
-enum Type {
+enum HandType {
     FiveOfAKind = 6,
     FourOfAKind = 5,
     FullHouse = 4,
@@ -23,7 +23,7 @@ enum Type {
 
 #[derive(Debug, PartialEq, Eq)]
 struct Hand<'a> {
-    type_strength: Type,
+    type_strength: HandType,
     cards: &'a str,
     bid: u64,
 }
@@ -68,26 +68,26 @@ impl<'a> PartialOrd for Hand<'a> {
     }
 }
 
-fn get_type_strength(cards: &str) -> Option<Type> {
+fn get_type_strength(cards: &str) -> Option<HandType> {
     let frequency = cards.chars().counts();
     match frequency.len() {
-        1 => Some(Type::FiveOfAKind),
+        1 => Some(HandType::FiveOfAKind),
         2 => {
             if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 4) {
-                return Some(Type::FourOfAKind);
+                return Some(HandType::FourOfAKind);
             } else {
-                return Some(Type::FullHouse);
+                return Some(HandType::FullHouse);
             }
         }
         3 => {
             if let Some(_) = frequency.into_iter().find(|(_, v)| *v == 3) {
-                return Some(Type::ThreeOfAKind);
+                return Some(HandType::ThreeOfAKind);
             } else {
-                return Some(Type::TwoPair);
+                return Some(HandType::TwoPair);
             }
         }
-        4 => Some(Type::OnePair),
-        5 => Some(Type::HighCard),
+        4 => Some(HandType::OnePair),
+        5 => Some(HandType::HighCard),
         _ => None,
     }
 }
