@@ -13,5 +13,5 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11")
 
 
 (deftest test-part-1
-  (testing " FIXME, I fail. "
+  (testing " Day 04 part 1 "
     (is (= 13 (process-part-1 input)))))
