@@ -32,3 +32,5 @@
        (map extract-numbers)
        (map evaluate-score)
        (reduce +)))
+
+(defn process-part-2 [input] 0)

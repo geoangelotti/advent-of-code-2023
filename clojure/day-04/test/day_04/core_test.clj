@@ -15,3 +15,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11")
 (deftest test-part-1
   (testing " Day 04 part 1 "
     (is (= 13 (process-part-1 input)))))
+
+(deftest test-part-2
+  (testing " Day 04 part 2 "
+    (is (= 30 (process-part-2 input)))))
