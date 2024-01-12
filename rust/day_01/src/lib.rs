@@ -7,8 +7,13 @@ pub fn process_part_1(input: &str) -> String {
         .map(|line| {
             let values = line
                 .chars()
-                .filter(|char| char.is_ascii_digit())
-                .map(|char| char as u32 - '0' as u32)
+                .filter_map(|c| {
+                    if c.is_ascii_digit() {
+                        Some(c as u32 - '0' as u32)
+                    } else {
+                        None
+                    }
+                })
                 .collect::<Vec<u32>>();
             match values.len() {
                 0 => 0,
