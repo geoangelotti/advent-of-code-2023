@@ -33,4 +33,28 @@
        (map evaluate-score)
        (reduce +)))
 
-(defn process-part-2 [input] 0)
+
+(defn process-part-2 [input]
+  (let [lines (clojure.string/split-lines input)
+        init-cards (reduce
+                    (fn [cards n]
+                      (assoc cards (inc n) 1))
+                    {}
+                    (range (count (clojure.string/split-lines input))))]
+    (->> lines
+         (reduce (fn [cards line]
+                   (let [[winning-line my-number] (clojure.string/split line #"\|")
+                         [card-line winning-numbers] (clojure.string/split winning-line #":")
+                         card-number (parse-long (re-find #"\d+" card-line))
+                         matches (count
+                                  (set/intersection
+                                   (set (re-seq #"\d+" winning-numbers))
+                                   (set (re-seq #"\d+" my-number))))]
+                     (reduce
+                      (fn [cards match]
+                        (update cards match (fn [n] (+ (get cards card-number) (or n 0)))))
+                      cards
+                      (range (inc card-number) (inc (+ matches card-number))))))
+                 init-cards)
+         vals
+         (reduce +))))
