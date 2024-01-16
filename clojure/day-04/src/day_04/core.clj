@@ -24,11 +24,9 @@
        (#(if (= % 0) 0 (Math/pow 2 (dec %))))
        (int)))
 
-(defn lines [input] (clojure.string/split-lines input))
-
 (defn process-part-1 [input]
   (->> input
-       (lines)
+       (#(clojure.string/split-lines %))
        (map extract-numbers)
        (map evaluate-score)
        (reduce +)))
