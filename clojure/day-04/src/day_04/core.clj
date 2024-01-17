@@ -26,7 +26,7 @@
 
 (defn process-part-1 [input]
   (->> input
-       (#(clojure.string/split-lines %))
+       (clojure.string/split-lines)
        (map extract-numbers)
        (map evaluate-score)
        (reduce +)))
