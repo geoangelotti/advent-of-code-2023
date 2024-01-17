@@ -1,2 +1,4 @@
 (library
- (name day_07))
+ (name day_07)
+ (modules lib)
+ (libraries str))
