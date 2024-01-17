@@ -22,8 +22,8 @@ enum HandType {
 
 fn get_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
     use HandType::*;
-    let frequency = cards.chars().counts().values().sorted().join("");
-    let hand_type = match frequency.deref() {
+    let counts = cards.chars().counts().values().sorted().join("");
+    let hand_type = match counts.deref() {
         "5" => Some(FiveOfAKind),
         "14" => Some(FourOfAKind),
         "23" => Some(FullHouse),
@@ -51,12 +51,12 @@ fn get_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
 
 fn get_joker_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
     use HandType::*;
-    let frequency = cards.chars().counts();
-    let values = if let Some(joker_count) = frequency.get(&'J') {
+    let counts = cards.chars().counts();
+    let values = if let Some(joker_count) = counts.get(&'J') {
         if *joker_count == 5 {
             "5".to_string()
         } else {
-            frequency
+            counts
                 .iter()
                 .filter_map(|(key, value)| (key != &'J').then_some(value))
                 .sorted()
@@ -68,7 +68,7 @@ fn get_joker_hand_strength(cards: &str) -> (HandType, (u32, u32, u32, u32, u32))
                 .join("")
         }
     } else {
-        frequency.values().sorted().join("")
+        counts.values().sorted().join("")
     };
 
     let hand_type = match values.deref() {
