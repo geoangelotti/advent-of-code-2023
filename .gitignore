@@ -1,3 +1,5 @@
 go.work
 .vscode
 input.txt
+.lsp
+.clj-kondo
