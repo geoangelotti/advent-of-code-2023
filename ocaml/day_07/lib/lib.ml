@@ -24,7 +24,7 @@ module Day_07 = struct
     | OnePair
     | HighCard
 
-  let get_strength = function
+  let hand_type_to_int = function
     | FiveOfAKind -> 6
     | FourOfAKind -> 5
     | FullHouse -> 4
@@ -48,7 +48,7 @@ module Day_07 = struct
     in
     Option.get opt
 
-  let hand_type hand =
+  let string_to_hand_type hand =
     let hand =
       match hand with
       | "5" -> Some FiveOfAKind
@@ -65,8 +65,8 @@ module Day_07 = struct
   let compare_hands hand1 hand2 =
     let (h1_type, h1_score), _ = hand1 in
     let (h2_type, h2_score), _ = hand2 in
-    let h1_strength = get_strength h1_type in
-    let h2_strength = get_strength h2_type in
+    let h1_strength = hand_type_to_int h1_type in
+    let h2_strength = hand_type_to_int h2_type in
     let compare_scores sc1 sc2 =
       match (sc1, sc2) with
       | [], [] -> 0
@@ -94,7 +94,7 @@ module Day_07 = struct
     let counts = List.of_seq (Hashtbl.to_seq_values counts) in
     let sorted = List.sort compare counts in
     let joined = String.concat "" (List.map string_of_int sorted) in
-    let hand_type = hand_type joined in
+    let hand_type = string_to_hand_type joined in
     let chars = string_to_char_list hand in
     let scores = List.map card_to_score chars in
     (hand_type, scores)
