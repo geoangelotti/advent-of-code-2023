@@ -11,5 +11,15 @@ let process_part_1_test _ =
   let result = process_part_1 input in
   assert_equal ~printer:(fun x -> x) "6440" result
 
-let suite = "Test Suite" >::: [ "process_part_1" >:: process_part_1_test ]
+let process_part_2_test _ =
+  let result = process_part_2 input in
+  assert_equal ~printer:(fun x -> x) "5905" result
+
+let suite =
+  "Test Suite"
+  >::: [
+         "process_part_1" >:: process_part_1_test;
+         "process_part_2" >:: process_part_2_test;
+       ]
+
 let () = run_test_tt_main suite
