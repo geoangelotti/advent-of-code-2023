@@ -87,7 +87,7 @@ module Day_07 = struct
     | 'Q' -> 12
     | 'J' -> 11
     | 'T' -> 10
-    | _ -> int_of_char card
+    | _ -> int_of_char card - int_of_char '0'
 
   let get_hand_strength hand =
     let counts = character_counts hand in
