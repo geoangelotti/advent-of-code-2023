@@ -58,6 +58,7 @@ module Day_07 = struct
       | "122" -> Some TwoPair
       | "1112" -> Some OnePair
       | "11111" -> Some HighCard
+      | "" -> Some FiveOfAKind
       | _ -> None
     in
     Option.get hand
@@ -89,6 +90,15 @@ module Day_07 = struct
     | 'T' -> 10
     | _ -> int_of_char card - int_of_char '0'
 
+  let joker_card_to_score card =
+    match card with
+    | 'A' -> 14
+    | 'K' -> 13
+    | 'Q' -> 12
+    | 'J' -> 0
+    | 'T' -> 10
+    | _ -> int_of_char card - int_of_char '0'
+
   let get_hand_strength hand =
     let counts = character_counts hand in
     let counts = List.of_seq (Hashtbl.to_seq_values counts) in
@@ -98,6 +108,31 @@ module Day_07 = struct
     let chars = string_to_char_list hand in
     let scores = List.map card_to_score chars in
     (hand_type, scores)
+
+  let get_joker_hand_strength hand =
+    let counts = character_counts hand in
+    let jokers = Hashtbl.find_opt counts 'J' in
+    match jokers with
+    | None -> get_hand_strength hand
+    | Some jokers ->
+        let filtered = Str.global_replace (Str.regexp "J") "" hand in
+        let counts = character_counts filtered in
+        let counts = List.of_seq (Hashtbl.to_seq counts) in
+        let sorted = List.sort (fun (_, ai) (_, bi) -> ai - bi) counts in
+        let rec add_joker list joker =
+          match list with
+          | [] -> []
+          | [ (c, i) ] -> (c, i + joker) :: add_joker [] joker
+          | hd :: tl -> hd :: add_joker tl joker
+        in
+        let jokered = add_joker sorted jokers in
+        let joined =
+          String.concat "" (List.map (fun (_, i) -> string_of_int i) jokered)
+        in
+        let hand_type = string_to_hand_type joined in
+        let chars = string_to_char_list hand in
+        let scores = List.map joker_card_to_score chars in
+        (hand_type, scores)
 
   let parse line get_hand_strength =
     let parts = Str.split (Str.regexp " ") line in
@@ -114,6 +149,17 @@ module Day_07 = struct
   let process_part_1 input =
     let lines = input |> Utils.split_into_lines in
     let hands = List.map (fun line -> parse line get_hand_strength) lines in
+    let sorted = List.sort compare_hands hands in
+    let enumerated = enumerate_list sorted in
+    let take_bid (i, (_, bid)) = (i + 1) * bid in
+    let bids = List.map take_bid enumerated in
+    List.fold_left ( + ) 0 bids |> string_of_int
+
+  let process_part_2 input =
+    let lines = input |> Utils.split_into_lines in
+    let hands =
+      List.map (fun line -> parse line get_joker_hand_strength) lines
+    in
     let sorted = List.sort compare_hands hands in
     let enumerated = enumerate_list sorted in
     let take_bid (i, (_, bid)) = (i + 1) * bid in
