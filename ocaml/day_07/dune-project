@@ -1,0 +1,26 @@
+(lang dune 3.12)
+
+(name day_07)
+
+(generate_opam_files true)
+
+(source
+ (github geoangelotti/advent-of-code-23))
+
+(authors "Geo Angelopoulos")
+
+(maintainers "Geo Angelopoulos")
+
+(license "MIT License")
+
+(documentation https://github.com/geoangelotti/advent-of-code-2023/)
+
+(package
+ (name day_07)
+ (synopsis "AoC 2023 Day 07")
+ (description "Advent of Code 2023 Day 07 Camel Cards")
+ (depends ocaml dune str ounit2)
+ (tags
+  (ocaml advent-of-code advent-of-code-2023 day_07 camel-cards)))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
