@@ -73,27 +73,18 @@ module Day_07 = struct
 
   let string_to_char_list s = s |> String.to_seq |> List.of_seq
 
-  let card_to_score card =
+  let card_to_score card joker_score =
     match card with
     | 'A' -> 14
     | 'K' -> 13
     | 'Q' -> 12
-    | 'J' -> 11
-    | 'T' -> 10
-    | _ -> int_of_char card - int_of_char '0'
-
-  let joker_card_to_score card =
-    match card with
-    | 'A' -> 14
-    | 'K' -> 13
-    | 'Q' -> 12
-    | 'J' -> 0
+    | 'J' -> joker_score
     | 'T' -> 10
     | _ -> int_of_char card - int_of_char '0'
 
   let get_hand_strength hand =
     let chars = string_to_char_list hand in
-    let scores = List.map card_to_score chars in
+    let scores = List.map (fun card -> card_to_score card 11) chars in
     let counts = character_counts hand in
     let counts = List.of_seq (Hashtbl.to_seq_values counts) in
     let sorted = List.sort compare counts in
@@ -108,7 +99,7 @@ module Day_07 = struct
     | None -> get_hand_strength hand
     | Some jokers ->
         let chars = string_to_char_list hand in
-        let scores = List.map joker_card_to_score chars in
+        let scores = List.map (fun card -> card_to_score card 0) chars in
         let filtered = Str.global_replace (Str.regexp "J") "" hand in
         let counts = character_counts filtered in
         let counts = List.of_seq (Hashtbl.to_seq counts) in
@@ -138,7 +129,7 @@ module Day_07 = struct
     in
     enumerate_list_helper [] 0 list
 
-  let process_part_1 input =
+  let process input get_hand_strength =
     let lines = Str.split (Str.regexp "\n") input in
     let hands = List.map (fun line -> parse line get_hand_strength) lines in
     let sorted = List.sort compare_hands hands in
@@ -147,14 +138,6 @@ module Day_07 = struct
     let bids = List.map take_bid enumerated in
     List.fold_left ( + ) 0 bids |> string_of_int
 
-  let process_part_2 input =
-    let lines = Str.split (Str.regexp "\n") input in
-    let hands =
-      List.map (fun line -> parse line get_joker_hand_strength) lines
-    in
-    let sorted = List.sort compare_hands hands in
-    let enumerated = enumerate_list sorted in
-    let take_bid (i, (_, bid)) = (i + 1) * bid in
-    let bids = List.map take_bid enumerated in
-    List.fold_left ( + ) 0 bids |> string_of_int
+  let process_part_1 input = process input get_hand_strength
+  let process_part_2 input = process input get_joker_hand_strength
 end
