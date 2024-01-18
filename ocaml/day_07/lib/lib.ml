@@ -92,13 +92,13 @@ module Day_07 = struct
     | _ -> int_of_char card - int_of_char '0'
 
   let get_hand_strength hand =
+    let chars = string_to_char_list hand in
+    let scores = List.map card_to_score chars in
     let counts = character_counts hand in
     let counts = List.of_seq (Hashtbl.to_seq_values counts) in
     let sorted = List.sort compare counts in
     let joined = String.concat "" (List.map string_of_int sorted) in
     let hand_type = string_to_hand_type joined in
-    let chars = string_to_char_list hand in
-    let scores = List.map card_to_score chars in
     (hand_type, scores)
 
   let get_joker_hand_strength hand =
@@ -107,6 +107,8 @@ module Day_07 = struct
     match jokers with
     | None -> get_hand_strength hand
     | Some jokers ->
+        let chars = string_to_char_list hand in
+        let scores = List.map joker_card_to_score chars in
         let filtered = Str.global_replace (Str.regexp "J") "" hand in
         let counts = character_counts filtered in
         let counts = List.of_seq (Hashtbl.to_seq counts) in
@@ -122,8 +124,6 @@ module Day_07 = struct
           String.concat "" (List.map (fun (_, i) -> string_of_int i) jokered)
         in
         let hand_type = string_to_hand_type joined in
-        let chars = string_to_char_list hand in
-        let scores = List.map joker_card_to_score chars in
         (hand_type, scores)
 
   let parse line get_hand_strength =
