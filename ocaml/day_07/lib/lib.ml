@@ -99,7 +99,7 @@ module Day_07 = struct
     let scores = List.map card_to_score chars in
     (hand_type, scores)
 
-  let parse line =
+  let parse line get_hand_strength =
     let parts = Str.split (Str.regexp " ") line in
     (get_hand_strength (List.hd parts), int_of_string (List.hd (List.tl parts)))
 
@@ -113,7 +113,7 @@ module Day_07 = struct
 
   let process_part_1 input =
     let lines = input |> Utils.split_into_lines in
-    let hands = List.map parse lines in
+    let hands = List.map (fun line -> parse line get_hand_strength) lines in
     let sorted = List.sort compare_hands hands in
     let enumerated = enumerate_list sorted in
     let take_bid (i, (_, bid)) = (i + 1) * bid in
