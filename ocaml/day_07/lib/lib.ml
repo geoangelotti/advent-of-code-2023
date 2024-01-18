@@ -42,12 +42,6 @@ module Day_07 = struct
       s;
     counts
 
-  let list_to_tuple list =
-    let opt =
-      match list with [ a; b; c; d; e ] -> Some (a, b, c, d, e) | _ -> None
-    in
-    Option.get opt
-
   let string_to_hand_type hand =
     let hand =
       match hand with
