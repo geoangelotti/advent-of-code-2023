@@ -10,8 +10,6 @@ module Utils = struct
         accumulator
     in
     read_lines ""
-
-  let split_into_lines input_string = Str.split (Str.regexp "\n") input_string
 end
 
 module Day_07 = struct
@@ -141,7 +139,7 @@ module Day_07 = struct
     enumerate_list_helper [] 0 list
 
   let process_part_1 input =
-    let lines = input |> Utils.split_into_lines in
+    let lines = Str.split (Str.regexp "\n") input in
     let hands = List.map (fun line -> parse line get_hand_strength) lines in
     let sorted = List.sort compare_hands hands in
     let enumerated = enumerate_list sorted in
@@ -150,7 +148,7 @@ module Day_07 = struct
     List.fold_left ( + ) 0 bids |> string_of_int
 
   let process_part_2 input =
-    let lines = input |> Utils.split_into_lines in
+    let lines = Str.split (Str.regexp "\n") input in
     let hands =
       List.map (fun line -> parse line get_joker_hand_strength) lines
     in
