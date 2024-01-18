@@ -104,12 +104,12 @@ module Day_07 = struct
     (get_hand_strength (List.hd parts), int_of_string (List.hd (List.tl parts)))
 
   let enumerate_list list =
-    let rec enumerate_list_helper n list =
+    let rec enumerate_list_helper acc n list =
       match list with
-      | [] -> []
-      | hd :: tl -> (n, hd) :: enumerate_list_helper (n + 1) tl
+      | [] -> acc
+      | hd :: tl -> enumerate_list_helper (acc @ [ (n, hd) ]) (n + 1) tl
     in
-    enumerate_list_helper 0 list
+    enumerate_list_helper [] 0 list
 
   let process_part_1 input =
     let lines = input |> Utils.split_into_lines in
