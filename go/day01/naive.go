@@ -2,6 +2,7 @@ package day01
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -32,7 +33,7 @@ func (n Number) GetValue() int64 {
 
 }
 
-func niceProcessPart2(input string) string {
+func NaiveProcessPart2(input string) string {
 	lines := strings.Split(input, "\n")
 	var sum int64
 	numbers := []string{
@@ -57,21 +58,21 @@ func niceProcessPart2(input string) string {
 		firstIndex = len(line) + 1
 		lastIndex = -1
 		for _, number := range numbers {
-			i := strings.Index(line, number)
-			if -1 != i {
-				if i <= firstIndex {
-					firstIndex = i
-					firstValue = Number{number}.GetValue()
-				}
-				if i >= lastIndex {
-					lastIndex = i
-					lastValue = Number{number}.GetValue()
+			for _, i := range regexp.MustCompile(number).FindAllStringIndex(line, -1) {
+				i := i[0]
+				if i != -1 {
+					if i <= firstIndex {
+						firstIndex = i
+						firstValue = Number{number}.GetValue()
+					}
+					if i >= lastIndex {
+						lastIndex = i
+						lastValue = Number{number}.GetValue()
+					}
 				}
 			}
 		}
-		lastsum := sum
 		sum += firstValue*10 + lastValue
-		fmt.Println(line, firstValue, lastValue, sum-lastsum)
 	}
 	return fmt.Sprint(sum)
 }
