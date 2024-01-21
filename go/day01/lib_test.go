@@ -33,3 +33,11 @@ func TestProcessPart2(t *testing.T) {
 		t.Errorf("Expected %s got %s", expected, answer)
 	}
 }
+
+func TestProcessPart2Naive(t *testing.T) {
+	expected := "281"
+	answer := day01.NaiveProcessPart2(INPUT2)
+	if answer != expected {
+		t.Errorf("Expected %s got %s", expected, answer)
+	}
+}
