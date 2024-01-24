@@ -12,3 +12,12 @@ export function processPart1(input: string): string {
 		return time - 2 * Number(minimumTimeHeld) + 1
 	}).reduce((acc, c) => acc * c, 1).toString();
 };
+
+export function processPart2(input: string): string {
+	const numbers = new RegExp(/[0-9]+/g);
+	const lines = input.split("\n");
+	const time = Number(Array.from(lines[0].matchAll(numbers)).join("")); 
+	const distance = Number(Array.from(lines[1].matchAll(numbers)).join("")); 
+	const minimumTimeHeld = Array.from(Array(time+1).keys()).find(timeHeld => timeHeld * (time - timeHeld) > distance);
+	return (time - 2 * Number(minimumTimeHeld) + 1).toString();
+};
