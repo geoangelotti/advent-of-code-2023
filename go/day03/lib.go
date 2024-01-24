@@ -11,6 +11,11 @@ type Point struct {
 	y int
 }
 
+type Symbol struct {
+	p Point
+	c rune
+}
+
 type Cell struct {
 	value   int8
 	special bool
@@ -25,7 +30,60 @@ func isEnginePart(p Point, g [][]Cell, result *bool) {
 	}
 }
 
+func getSymbols(input string) []Symbol {
+	lines := strings.Split(input, "\n")
+	symbols := []Symbol{}
+	indeces := regexp.MustCompile(`[^.0-9]`)
+	for y, line := range lines {
+		xs := indeces.FindAllStringIndex(line, -1)
+		for _, x := range xs {
+			if len(x) > 0 {
+				symbols = append(symbols, Symbol{Point{x[0], y}, rune(line[x[0]])})
+			}
+		}
+	}
+	return symbols
+}
+
+func getEngineParts(input string) []EnginePart {
+	engineParts := []EnginePart{}
+	for y, line := range strings.Split(input, "\n") {
+		span := Span{-1, -1}
+		var acc uint64
+		for x, char := range line {
+			if char >= '0' && char <= '9' {
+				if span.start == -1 {
+					span.start = x
+				}
+				acc = acc*10 + uint64(char-'0')
+				span.end = x
+			} else {
+				if span.end != -1 {
+					engineParts = append(engineParts, EnginePart{y, span, acc})
+					span = Span{-1, -1}
+					acc = 0
+				}
+			}
+		}
+		if span.end != -1 {
+			engineParts = append(engineParts, EnginePart{y, span, acc})
+		}
+	}
+	return engineParts
+}
+
+func Process(input string) string {
+	var sum uint64
+	symbols := getSymbols(input)
+	fmt.Println(symbols)
+	engineParts := getEngineParts(input)
+	fmt.Println(engineParts)
+	fmt.Println()
+	return fmt.Sprint(sum)
+}
+
 func ProcessPart1(input string) string {
+	Process(input)
 	grid := [][]Cell{}
 	var sum uint64
 	for _, line := range strings.Split(input, "\n") {
