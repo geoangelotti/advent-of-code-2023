@@ -8,7 +8,7 @@ export function processPart1(input: string): string {
 	const zipped = zip(times, distances);
 	return zipped.map(item => {
 		const [[time], [distance]] = item.map(i => i.map(j => Number(j)));
-		let minimumTimeHeld = Array.from(Array(time+1).keys()).find(timeHeld => timeHeld * (time - timeHeld) > distance);
+		const minimumTimeHeld = Array.from(Array(time+1).keys()).find(timeHeld => timeHeld * (time - timeHeld) > distance);
 		return time - 2 * Number(minimumTimeHeld) + 1
 	}).reduce((acc, c) => acc * c, 1).toString();
 };
