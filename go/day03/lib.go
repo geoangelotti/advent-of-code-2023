@@ -16,20 +16,6 @@ type Symbol struct {
 	c rune
 }
 
-type Cell struct {
-	value   int8
-	special bool
-}
-
-func isEnginePart(p Point, g [][]Cell, result *bool) {
-	defer func() {
-		recover()
-	}()
-	if g[p.y][p.x].value == -1 {
-		*result = true
-	}
-}
-
 func getSymbols(input string) []Symbol {
 	lines := strings.Split(input, "\n")
 	symbols := []Symbol{}
@@ -72,81 +58,47 @@ func getEngineParts(input string) []EnginePart {
 	return engineParts
 }
 
-func Process(input string) string {
-	var sum uint64
-	symbols := getSymbols(input)
-	fmt.Println(symbols)
-	engineParts := getEngineParts(input)
-	fmt.Println(engineParts)
-	fmt.Println()
-	return fmt.Sprint(sum)
+func getEmptyGrid(input string) [][]*EnginePart {
+	grid := [][]*EnginePart{}
+	for _, line := range strings.Split(input, "\n") {
+		row := []*EnginePart{}
+		for _, _ = range line {
+			row = append(row, nil)
+		}
+		grid = append(grid, row)
+	}
+	return grid
 }
 
 func ProcessPart1(input string) string {
-	Process(input)
-	grid := [][]Cell{}
 	var sum uint64
-	for _, line := range strings.Split(input, "\n") {
-		chars := []Cell{}
-		for _, char := range line {
-			if char >= '0' && char <= '9' {
-				chars = append(chars, Cell{int8(char - '0'), false})
-			} else if char == '.' {
-				chars = append(chars, Cell{-2, false})
-			} else {
-				chars = append(chars, Cell{-1, false})
-			}
-		}
-		grid = append(grid, chars)
-	}
-	for y, line := range grid {
-		for x, cell := range line {
-			special := false
-			if cell.value >= 0 {
-				points := []Point{
-					{x - 1, y - 1},
-					{x, y - 1},
-					{x + 1, y - 1},
-					{x - 1, y},
-					{x + 1, y},
-					{x - 1, y + 1},
-					{x, y + 1},
-					{x + 1, y + 1}}
-				for _, point := range points {
-					isEnginePart(point, grid, &special)
-				}
-				cell.special = special
-				grid[y][x] = cell
-			}
+	symbols := getSymbols(input)
+	engineParts := getEngineParts(input)
+	grid := getEmptyGrid(input)
+	for _, part := range engineParts {
+		p := part
+		for i := part.span.start; i <= part.span.end; i++ {
+			grid[part.line][i] = &p
 		}
 	}
-	for _, line := range grid {
-		groups := [][]Cell{}
-		group := []Cell{}
-		for _, cell := range line {
-			if cell.value < 0 {
-				groups = append(groups, group)
-				group = []Cell{}
-			} else {
-				group = append(group, cell)
-			}
+	parts := map[string]EnginePart{}
+	for _, symbol := range symbols {
+		points := []Point{
+			{symbol.p.x - 1, symbol.p.y - 1},
+			{symbol.p.x, symbol.p.y - 1},
+			{symbol.p.x + 1, symbol.p.y - 1},
+			{symbol.p.x - 1, symbol.p.y},
+			{symbol.p.x + 1, symbol.p.y},
+			{symbol.p.x - 1, symbol.p.y + 1},
+			{symbol.p.x, symbol.p.y + 1},
+			{symbol.p.x + 1, symbol.p.y + 1},
 		}
-		groups = append(groups, group)
-		for _, group := range groups {
-			if len(group) > 0 {
-				special := false
-				var acc uint64
-				for _, cell := range group {
-					if cell.special {
-						special = true
-					}
-					acc = acc*10 + uint64(cell.value)
-				}
-				if special {
-					sum += acc
-				}
-			}
+		for _, point := range points {
+			isNumber(point, grid, parts)
 		}
+	}
+	for _, part := range parts {
+		sum += part.Value
 	}
 	return fmt.Sprint(sum)
 }
@@ -223,9 +175,8 @@ func ProcessPart2(input string) string {
 			grid[part.line][i] = &p
 		}
 	}
-	fmt.Println(parts)
-	fmt.Println(gears)
-	//fmt.Println(grid)
+	//fmt.Println(parts)
+	//fmt.Println(gears)
 	for _, gear := range gears {
 		parts := map[string]EnginePart{}
 		points := []Point{
