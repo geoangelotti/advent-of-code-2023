@@ -3,13 +3,10 @@ CC = gcc
 CFLAGS = -Wall -Werror
 LIBS = 
 
-all:
+all: main
 
-lib.o: lib.c
-	$(CC) $(CFLAGS) -c -o lib.o lib.c
-
-test: lib.o test.c
-	$(CC) $(CFLAGS) -o test.out test.c lib.o
+main: main.c
+	$(CC) $(CFLAGS) main.c -o main.out
 
 clean:
 	rm -rf *.o *.out
