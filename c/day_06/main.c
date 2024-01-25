@@ -1,13 +1,7 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-#define BUFFER_COUNT 1024
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 long processpart1(char *filepath)
 {
