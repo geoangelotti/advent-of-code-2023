@@ -12,8 +12,8 @@ type Point struct {
 }
 
 type Symbol struct {
-	p Point
-	c rune
+	p    Point
+	char rune
 }
 
 func getSymbols(input string) []Symbol {
@@ -98,7 +98,7 @@ func ProcessPart1(input string) string {
 		}
 	}
 	for _, part := range parts {
-		sum += part.Value
+		sum += part.value
 	}
 	return fmt.Sprint(sum)
 }
@@ -111,7 +111,7 @@ type Span struct {
 type EnginePart struct {
 	line  int
 	span  Span
-	Value uint64
+	value uint64
 }
 
 func (e EnginePart) Id() string {
@@ -132,7 +132,7 @@ func ProcessPart2(input string) string {
 	symbols := getSymbols(input)
 	gears := []Symbol{}
 	for _, symbol := range symbols {
-		if symbol.c == '*' {
+		if symbol.char == '*' {
 			gears = append(gears, symbol)
 		}
 	}
@@ -162,7 +162,7 @@ func ProcessPart2(input string) string {
 		if len(parts) == 2 {
 			var product uint64 = 1
 			for _, part := range parts {
-				product *= part.Value
+				product *= part.value
 			}
 			sum += uint64(product)
 		}
