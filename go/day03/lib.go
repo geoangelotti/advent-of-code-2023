@@ -16,6 +16,21 @@ type Symbol struct {
 	char rune
 }
 
+type Span struct {
+	start int
+	end   int
+}
+
+type EnginePart struct {
+	line  int
+	span  Span
+	value uint64
+}
+
+func (e EnginePart) Id() string {
+	return fmt.Sprintf("%d,%d-%d", e.span.start, e.span.end, e.line)
+}
+
 func getSymbols(input string) []Symbol {
 	lines := strings.Split(input, "\n")
 	symbols := []Symbol{}
@@ -101,21 +116,6 @@ func ProcessPart1(input string) string {
 		sum += part.value
 	}
 	return fmt.Sprint(sum)
-}
-
-type Span struct {
-	start int
-	end   int
-}
-
-type EnginePart struct {
-	line  int
-	span  Span
-	value uint64
-}
-
-func (e EnginePart) Id() string {
-	return fmt.Sprintf("%d,%d-%d", e.span.start, e.span.end, e.line)
 }
 
 func isNumber(point Point, grid [][]*EnginePart, numbers map[string]EnginePart) {
