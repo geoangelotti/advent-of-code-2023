@@ -129,72 +129,38 @@ func isNumber(point Point, grid [][]*EnginePart, numbers map[string]EnginePart) 
 
 func ProcessPart2(input string) string {
 	var sum uint64
-	lines := strings.Split(input, "\n")
-	gears := []Point{}
-	gearIndeces := regexp.MustCompile(`\*`)
-	for y, line := range lines {
-		xs := gearIndeces.FindAllStringIndex(line, -1)
-		fmt.Println(xs)
-		for _, x := range xs {
-			if len(x) > 0 {
-				gears = append(gears, Point{x[0], y})
-			}
+	symbols := getSymbols(input)
+	gears := []Symbol{}
+	for _, symbol := range symbols {
+		if symbol.c == '*' {
+			gears = append(gears, symbol)
 		}
-
 	}
-	parts := []EnginePart{}
-	grid := [][]*EnginePart{}
-	for y, line := range lines {
-		row := []*EnginePart{}
-		startIndex := -1
-		var acc uint64
-		for x, char := range line {
-			row = append(row, nil)
-			if '0' <= char && '9' >= char {
-				if startIndex == -1 {
-					startIndex = x
-				}
-				acc = acc*10 + uint64(char-'0')
-
-			} else if acc != 0 {
-				span := Span{startIndex, x - 1}
-				part := EnginePart{y, span, acc}
-				parts = append(parts, part)
-				acc = 0
-				startIndex = -1
-			}
-		}
-		if startIndex != -1 {
-			parts = append(parts, EnginePart{y, Span{startIndex, len(line) - 1}, acc})
-		}
-		grid = append(grid, row)
-	}
-	for _, part := range parts {
+	engineParts := getEngineParts(input)
+	grid := getEmptyGrid(input)
+	for _, part := range engineParts {
 		p := part
 		for i := part.span.start; i <= part.span.end; i++ {
 			grid[part.line][i] = &p
 		}
 	}
-	//fmt.Println(parts)
-	//fmt.Println(gears)
 	for _, gear := range gears {
 		parts := map[string]EnginePart{}
 		points := []Point{
-			{gear.x - 1, gear.y - 1},
-			{gear.x, gear.y - 1},
-			{gear.x + 1, gear.y - 1},
-			{gear.x - 1, gear.y},
-			{gear.x + 1, gear.y},
-			{gear.x - 1, gear.y + 1},
-			{gear.x, gear.y + 1},
-			{gear.x + 1, gear.y + 1},
+			{gear.p.x - 1, gear.p.y - 1},
+			{gear.p.x, gear.p.y - 1},
+			{gear.p.x + 1, gear.p.y - 1},
+			{gear.p.x - 1, gear.p.y},
+			{gear.p.x + 1, gear.p.y},
+			{gear.p.x - 1, gear.p.y + 1},
+			{gear.p.x, gear.p.y + 1},
+			{gear.p.x + 1, gear.p.y + 1},
 		}
 		for _, point := range points {
 			isNumber(point, grid, parts)
 		}
 		if len(parts) == 2 {
 			var product uint64 = 1
-			fmt.Println(gear, parts)
 			for _, part := range parts {
 				product *= part.Value
 			}
