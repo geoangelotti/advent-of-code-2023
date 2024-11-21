@@ -3,7 +3,6 @@ use std::collections::HashMap;
 pub fn process_part_1(input: &str) -> String {
     input
         .lines()
-        .into_iter()
         .map(|line| {
             let values = line
                 .chars()
